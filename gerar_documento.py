@@ -67,25 +67,25 @@ def montar():
     doc.add_paragraph("Professor: Gilberto Vieira Branco")
     doc.add_paragraph("Projeto: Sompo Seguros")
 
-    doc.add_heading("1. O que foi feito", level=1)
+    doc.add_heading("1. O que fizemos", level=1)
     doc.add_paragraph(
-        "Foi construído um sistema completo que integra as etapas pedidas pelo enunciado: "
-        "geração de dados IoT, envio para um servidor, armazenamento, análise de risco e "
-        "apresentação de um resultado organizado. O fluxo segue exatamente a ordem pedida: "
-        "IoT, Servidor, Dados, Análise, Resultado."
+        "Montamos um sistema completo que integra as etapas pedidas no enunciado: geração "
+        "de dados IoT, envio para um servidor, armazenamento, análise de risco e um "
+        "resultado organizado no final. O fluxo segue a ordem pedida: IoT, Servidor, Dados, "
+        "Análise, Resultado."
     )
     doc.add_paragraph(
-        "O enunciado pede para reaproveitar o código das Sprints 1 e 2 desta disciplina. "
-        "Esse código não estava disponível no momento da construção deste projeto, então o "
-        "sistema foi implementado do zero, cobrindo o mesmo fluxo que as Sprints 1 e 2 "
-        "provavelmente já tinham feito separadamente (geração e envio de dados IoT na Sprint "
-        "1, análise e alertas na Sprint 2), agora integrado num único sistema funcional."
+        "O enunciado pede pra reaproveitar o código das Sprints 1 e 2 da disciplina. A gente "
+        "não tinha esse código em mãos na hora de montar esse projeto, então construímos do "
+        "zero cobrindo o mesmo fluxo que as Sprints 1 e 2 provavelmente já cobriam separado "
+        "(gerar e enviar dados IoT na Sprint 1, analisar e gerar alertas na Sprint 2), agora "
+        "tudo integrado num sistema só."
     )
     doc.add_paragraph(
         "O sistema simula sensores de temperatura e umidade em 5 equipamentos rurais. A cada "
-        "execução, o gerador cria leituras normais e inclui de propósito algumas leituras "
+        "execução, o gerador cria leituras normais e mistura de propósito algumas leituras "
         "problemáticas (temperatura alta, umidade baixa, dado incompleto e uma repetição), "
-        "para garantir que todas as regras de risco possam ser demonstradas."
+        "pra garantir que dá pra ver todas as regras de risco funcionando."
     )
 
     doc.add_heading("2. Como o sistema está organizado", level=1)
@@ -100,9 +100,9 @@ def montar():
 
     doc.add_heading("3. Como funciona o score de risco", level=1)
     doc.add_paragraph(
-        "Cada leitura recebida é avaliada contra um conjunto de regras. Toda regra que "
-        "dispara soma pontos ao score do equipamento correspondente. O score final de um "
-        "equipamento é a soma dos pontos de todas as suas leituras na rodada."
+        "Cada leitura que chega passa por um conjunto de regras. Toda regra que dispara "
+        "soma pontos ao score do equipamento correspondente. O score final de um "
+        "equipamento é a soma dos pontos de todas as leituras dele na rodada."
     )
     tabela(doc, ["Regra", "Condição", "Pontos"], [
         ["Temperatura alta", "temperatura acima de 35°C", "+2"],
@@ -110,7 +110,7 @@ def montar():
         ["Dados incompletos", "campo obrigatório ausente na leitura", "+3"],
         ["Repetição", "mesma temperatura e umidade em leituras seguidas do mesmo equipamento", "+2"],
     ], larguras=[3.5, 9, 2.5])
-    doc.add_paragraph("A classificação final segue a tabela definida pelo professor:")
+    doc.add_paragraph("A classificação final segue a tabela que o professor deu no enunciado:")
     tabela(doc, ["Score", "Nível"], [
         ["0 a 2", "BAIXO"],
         ["3 a 5", "MEDIO"],
@@ -119,47 +119,47 @@ def montar():
 
     doc.add_heading("4. Segurança", level=1)
 
-    doc.add_heading("4.1 Como o sistema evita dados inválidos", level=2)
+    doc.add_heading("4.1 Como evitamos dados inválidos", level=2)
     doc.add_paragraph(
-        "A validação acontece no próprio servidor, antes de qualquer dado ser armazenado "
+        "A validação acontece no próprio servidor, antes de qualquer dado ser guardado "
         "(função validar_payload em servidor/app.py). O servidor rejeita, com resposta HTTP "
         "400, qualquer leitura que: não seja um objeto JSON válido; esteja sem os campos "
-        "obrigatórios (equipamento, temperatura, timestamp); tenha temperatura ou umidade "
-        "fora de uma faixa fisicamente plausível (temperatura entre -30°C e 80°C, umidade "
-        "entre 0% e 100%). Isso garante que o que chega até a análise já passou por um "
-        "primeiro filtro de sanidade."
+        "obrigatórios (equipamento, temperatura, timestamp); ou tenha temperatura ou "
+        "umidade fora de uma faixa fisicamente plausível (temperatura entre -30°C e 80°C, "
+        "umidade entre 0% e 100%). Assim, o que chega na análise já passou por um primeiro "
+        "filtro de sanidade."
     )
 
-    doc.add_heading("4.2 Como o sistema identifica dados suspeitos", level=2)
+    doc.add_heading("4.2 Como identificamos dados suspeitos", level=2)
     doc.add_paragraph(
         "Nem todo dado suspeito é claramente inválido, então a camada de análise "
-        "(analise/seguranca.py) faz verificações adicionais depois que os dados já foram "
-        "armazenados: confere de novo os limites físicos dos valores (defesa em "
-        "profundidade, caso algo escape da validação do servidor); sinaliza leituras com "
+        "(analise/seguranca.py) faz umas checagens a mais depois que os dados já foram "
+        "guardados: confere de novo os limites físicos dos valores (uma segunda camada de "
+        "proteção, caso algo escape da validação do servidor); sinaliza leituras com "
         "timestamp no futuro; e sinaliza leituras com um atraso muito grande entre o "
-        "horário registrado pelo sensor e o horário em que o servidor recebeu, o que pode "
+        "horário que o sensor registrou e o horário que o servidor recebeu, o que pode "
         "indicar reenvio de um dado antigo (replay) ou relógio do sensor adulterado. A "
-        "regra de repetição do próprio score de risco também funciona como um indício de "
-        "dado suspeito: um sensor que envia exatamente a mesma leitura duas vezes seguidas "
-        "pode estar com defeito ou sendo usado para inflar artificialmente os dados."
+        "própria regra de repetição do score de risco também serve como indício de dado "
+        "suspeito: um sensor que manda exatamente a mesma leitura duas vezes seguidas pode "
+        "estar com defeito ou sendo usado pra inflar os dados de propósito."
     )
 
     doc.add_heading("4.3 Como melhorar a segurança em produção", level=2)
     doc.add_paragraph(
-        "Este é um MVP acadêmico e roda localmente sem essas proteções, mas para um sistema "
-        "real de produção seriam necessárias, no mínimo:"
+        "Esse é um MVP acadêmico e roda local sem essas proteções, mas num sistema real de "
+        "produção a gente precisaria de pelo menos:"
     )
     for item in [
-        "Comunicação via HTTPS/TLS entre os dispositivos IoT e o servidor, para impedir "
-        "que os dados sejam lidos ou alterados no meio do caminho.",
-        "Autenticação por dispositivo (API key ou certificado por sensor), para o servidor "
-        "só aceitar dados de equipamentos cadastrados e conseguir revogar acesso de um "
+        "Comunicação via HTTPS/TLS entre os dispositivos IoT e o servidor, pra impedir que "
+        "os dados sejam lidos ou alterados no meio do caminho.",
+        "Autenticação por dispositivo (API key ou certificado por sensor), pra o servidor "
+        "só aceitar dados de equipamentos cadastrados e dar pra revogar o acesso de um "
         "dispositivo comprometido.",
-        "Limite de taxa de envio (rate limiting), para impedir que um sensor com defeito "
-        "ou malicioso sobrecarregue o servidor ou inflate os dados.",
-        "Assinatura ou hash de cada leitura, para detectar se o conteúdo foi alterado "
-        "entre o sensor e o servidor.",
-        "Log de auditoria de tudo que é rejeitado, para acompanhar tentativas repetidas de "
+        "Limite de taxa de envio (rate limiting), pra impedir que um sensor com defeito ou "
+        "malicioso sobrecarregue o servidor ou infle os dados.",
+        "Assinatura ou hash de cada leitura, pra detectar se o conteúdo foi alterado entre "
+        "o sensor e o servidor.",
+        "Log de auditoria de tudo que é rejeitado, pra acompanhar tentativas repetidas de "
         "envio de dados inválidos, o que pode indicar um sensor com defeito ou um ataque.",
     ]:
         doc.add_paragraph(item, style="List Bullet")

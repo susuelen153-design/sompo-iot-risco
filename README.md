@@ -1,4 +1,4 @@
-# Sistema de Risco IoT - Cognitive Cybersecurity
+# Sistema de Risco IoT
 
 Disciplina: Cibersegurança Cognitiva - Challenge Sprint 3
 Professor: Gilberto Vieira Branco

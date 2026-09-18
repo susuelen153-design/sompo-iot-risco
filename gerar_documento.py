@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Gera o documento do projeto (.docx): o que foi feito, como funciona o
-score, regras usadas e explicacao de seguranca."""
-
 import os
 
 from docx import Document
